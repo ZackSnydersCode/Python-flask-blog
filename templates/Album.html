@@ -1,0 +1,151 @@
+<h1>
+  Hello Album
+</h1>
+
+{% block content %}
+<body>
+  <div>
+  </div>
+  
+  <a href="/Regestered">Sign Up</a>
+  
+  <div id="album" style="display:grid;place-items:center;">
+    {% for file in data %}
+    <div id="{{ loop.index }}" class="box">
+      <h2 id="tit_{{ loop.index }}">{{ file.title }}</h2>
+     <img src="{{ url_for('static', filename='files/' + file.img) }}" id="img_{{ loop.index }}">
+      <audio controls>
+        <source src="{{ url_for('static', filename='files/' + file.aud) }}" id="audio_{{ loop.index }}">
+      </audio>
+      <h3 id="dec_{{ loop.index }}">{{ file.dec }}</h3>
+      <h2 id="auth_{{ loop.index }}">{{file.auth}}</h2>
+    </div>
+    {% endfor %}
+    <div class="package_frame" style="border:2px solid black;"></div>
+    <button class="com">Comment</button>
+    <div class="comment"></div>
+
+  </div>
+</body>
+
+{% endblock %}
+
+
+<script>
+
+  document.body.addEventListener('click',sending)
+  const comment = document.querySelector('.comment')
+  const comment_btn = document.querySelector('.com')
+ // comment_btn.addEventListener('click',record)
+  const package_frame = document.querySelector('.package_frame')
+  window.addEventListener('load',load_frame)
+  const all_packages = document.querySelectorAll('.box')
+  all_packages.forEach((package)=>{
+    package.addEventListener('click',giv_msg)
+  })
+ 
+  function giv_msg(){
+    console.log('tit_'+this.id)
+    const title = document.querySelector('#tit_' + this.id);
+    const image = document.querySelector('#img_' + this.id);
+    const audio = document.querySelector('#audio_' + this.id);
+    const dec = document.querySelector('#dec_' + this.id);
+    const auth = document.querySelector('#auth_' + this.id);
+
+    console.log(title.innerText,image.src,audio.src,dec.innerText,dec.innerText,auth.innerText)
+
+    fetch('/requested_package',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        'TITLE':title.innerText,
+        'IMAGE':image.src,
+        'AUDIO':audio.src,
+        'AUTH':auth.innerText
+      })
+    }).then(response=>response.json())
+    .then((data)=>{
+      console.log(data.result)
+    }).catch((err)=>{
+      console.log(err)
+    })
+
+  }
+  function load_frame(){
+    var datafs = JSON.parse('{{ data|tojson }}');
+    rand_data = datafs[(Math.floor(Math.random()*datafs.length))]
+    const t = document.createElement('p')
+    const i = document.createElement('img')
+    i.setAttribute('src','static/files/'+rand_data.img)
+    const au = document.createElement('audio')
+    au.setAttribute('controls','controls')
+    const s = document.createElement('source')
+    s.setAttribute('src','static/files/' + rand_data.aud)
+    au.appendChild(s)
+    const d = document.createElement('p')
+    const a = document.createElement('p')
+
+    package_frame.appendChild(t)
+    package_frame.appendChild(i)
+    package_frame.appendChild(au)
+    package_frame.appendChild(d)
+    package_frame.appendChild(a)
+
+    t.setAttribute('id','p_t')
+    i.setAttribute('id','p_i')
+    au.setAttribute('id','p_au')
+    d.setAttribute('id','p_d')
+    a.setAttribute('id','p_a')
+
+    const st = document.querySelector('#p_t')
+    const sd = document.querySelector('#p_d')
+    const sa = document.querySelector('#p_a')
+
+    st.innerText = rand_data.title
+    sd.innerText = rand_data.dec
+    sa.innerText = rand_data.auth
+
+  
+
+    
+
+
+   
+
+  }
+   function sending(){
+    
+   
+    const package_data = {
+        'title':'Sex sounds for you baby',
+        'img':'nisdc;CHSDCNJKNSCN.jpg',
+         'audio':'hdhjsadkjaakjdjsahajha.mp3',
+         'description':'i have sexeted yesterday , y my boyfriend i recorded my sound , listen it',
+         'author':'jamila qureshi'
+    }
+    
+    fetch('/Package',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify(package_data)
+    }).then(response => response.json())
+    .then((data)=>{
+      comment.innerHTML = data.msg
+    }).catch(err=>{
+      console.log(err)
+    })
+ 
+ 
+ }
+ 
+ window.addEventListener('load',()=>{
+  fetch('/profile',{
+    method:'POST'
+
+  })
+ })
+ </script>

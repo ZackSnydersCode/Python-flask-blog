@@ -1,0 +1,13 @@
+<html>
+    <h1>{{pro_data}}</h1><br>
+    <form action="/data" enctype="multipart/form-data" method="POST">
+        <a href="/Gallery">Album</a>
+        <input type="file" name="file"><br>
+        <input type="text" name="title"><br>
+        <legend>Description</legend><br>
+        <textarea name="description"></textarea><br>
+        <legend>Host Pic</legend>
+        <input type="file" name="host_pic">
+        <input type="submit">
+    </form>
+</html>
